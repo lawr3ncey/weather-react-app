@@ -1,7 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
-
 import { useState, useEffect } from "react";
+
+const apiKey = "e1cab25a7fe1904b0e58d01ae824c640";  // <-- ADD THIS
 
 function App() {
   const [city, setCity] = useState(localStorage.getItem("lastCity") || "");
@@ -61,6 +61,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
