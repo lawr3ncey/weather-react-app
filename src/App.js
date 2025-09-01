@@ -1,62 +1,66 @@
-import './App.css';
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import SearchBar from "./components/SearchBar";
+import Forecast from "./components/ForeCast";
+import WeatherCard from "./components/WeatherCard";
+import "./App.css";
 
-const apiKey = "e1cab25a7fe1904b0e58d01ae824c640";  // <-- ADD THIS
+const API_KEY = "e1cab25a7fe1904b0e58d01ae824c640";
 
 function App() {
-  const [city, setCity] = useState(localStorage.getItem("lastCity") || "");
+  const [city, setCity] = useState(localStorage.getItem("lastCity") || "Manila");
   const [weather, setWeather] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
+  // Fetch current weather
   useEffect(() => {
-    if (city) {
-      fetchWeather(city);
-    }
-  }, []);
+    if (!city) return;
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`)
+      .then((res) => {
+        if (!res.ok) throw new Error("City not found");
+        return res.json();
+      })
+      .then((data) => {
+        setWeather(data);
+        setError(null);
+        localStorage.setItem("lastCity", city);
+      })
+      .catch((err) => setError(err.message));
+  }, [city]);
 
-  async function fetchWeather(cityName) {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
-      );
-      if (!response.ok) throw new Error("City not found");
+    // Decide background class based on weather condition
+  const getBackground = () => {
+    if (!weather || !weather.weather) return "default-bg.jpg";
+    const main = weather.weather[0].main.toLowerCase();
+    if (main.includes("clear")) return "clear-weather.jpg";
+    if (main.includes("cloud")) return "cloud-weather.jpg";
+    if (main.includes("rain")) return "rain-weather.jpg";
+    if (main.includes("snow")) return "snow-weather.jpg";
+    if (main.includes("drizzle")) return "drizzle-weather.jpg";
+    if (main.includes("thunderstorm")) return "thunderstorm-weather.jpg";
+    if (main.includes("mist")) return "mist-weather.jpg";
+    if (main.includes("fog")) return "fog-weather.jpg";
+    return "default-bg.jpg";
+  };
 
-      const data = await response.json();
-      setWeather(data);
-      setError("");
-      localStorage.setItem("lastCity", cityName);
-    } catch (err) {
-      setError(err.message);
-      setWeather(null);
-    }
-  }
-
+  
   return (
-    <div className="app">
-      <h1>🌤️ Weather App</h1>
-      <input
-        type="text"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        placeholder="Enter city name"
-      />
-      <button onClick={() => fetchWeather(city)}>Search</button>
-
-      {error && <p>❌ {error}</p>}
-
+    <div
+      className="app"
+      style={{
+        backgroundImage: `url(/images/${getBackground()})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <h1>🌦 Weather App</h1>
+      <SearchBar onSearch={setCity} />
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {weather && (
-        <div className="weather-card">
-          <h2>
-            {weather.name}, {weather.sys.country}
-          </h2>
-          <img
-            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
-            alt="icon"
-          />
-          <p>🌡️ {weather.main.temp} °C</p>
-          <p>☁️ {weather.weather[0].description}</p>
-          <p>💧 {weather.main.humidity}%</p>
-        </div>
+        <>
+          <WeatherCard data={weather} />
+          <Forecast city={city} />
+        </>
       )}
     </div>
   );
