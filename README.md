@@ -3,7 +3,7 @@
 A simple and responsive weather application built with **React.js** that allows users to search for any city and view real-time weather information. The app fetches data from the **OpenWeatherMap API** and displays temperature, conditions, and a 5-day forecast with custom background images for each weather condition.  
 
 ## 🚀 Live Demo
-🔗 [View on Netlify](https://my-weather.netlify.app)  
+🔗 [View on Netlify](https://my-weather-react-ph.netlify.app/)  
 
 ---
 
