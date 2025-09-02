@@ -53,7 +53,7 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      <h1>🌦 Weather App</h1>
+      <h1>🌦️ My Weather</h1>
       <SearchBar onSearch={setCity} />
       {error && <p style={{ color: "red" }}>{error}</p>}
       {weather && (
